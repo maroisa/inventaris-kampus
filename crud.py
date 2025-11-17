@@ -4,25 +4,16 @@ conn = init_db()
 cursor = conn.cursor()
 
 
-def tampilkan_inventaris():
+def daftar_inventaris():
     cursor.execute(
         "select nama_barang, tipe_barang, count(*) as jumlah_barang, kondisi from inventaris i join barang b using (id_barang) group by id_barang, kondisi, nama_barang, tipe_barang order by id_barang;"
     )
     result = cursor.fetchall()
 
-    print("\n" + "-" * 20)
-    print("Daftar Barang")
-    for i in result:
-        print("-" * 20)
-        print("Nama barang:", i[0] + " (" + i[1] + ")")
-        print("Jumlah:", i[2])
-        print("Kondisi:", i[3])
-        print("-" * 20 + "\n")
-
-    input("Input untuk kembali... ")
+    return result
 
 
-def tampilkan_inventaris_tersedia():
+def daftar_inventaris_tersedia():
     cursor.execute(
         "select nama_barang, tipe_barang, count(*) as jumlah_barang from inventaris i join barang b using (id_barang) where kondisi='baik' group by id_barang, kondisi, nama_barang, tipe_barang order by id_barang;"
     )
@@ -36,7 +27,16 @@ def tampilkan_inventaris_tersedia():
         print("Jumlah:", i[2])
         print("-" * 20 + "\n")
 
-    input("Input untuk kembali... ")
+
+def daftar_barang():
+    cursor.execute("select * from barang")
+    res = cursor.fetchall()
+    print("-" * 20)
+    print("Daftar barang")
+    print("-" * 20)
+    for i in range(len(res)):
+        print(f"{i + 1}.", res[i][1])
+    return res
 
 
 def tambah_barang(nama, tipe):
@@ -45,8 +45,6 @@ def tambah_barang(nama, tipe):
     )
     conn.commit()
 
-    input("Input untuk kembali... ")
-
 
 def tambah_inventaris(id_barang):
     cursor.execute(
@@ -54,7 +52,6 @@ def tambah_inventaris(id_barang):
         (id_barang, "baik"),
     )
     conn.commit()
-    input("Input untuk kembali... ")
 
 
 def register_peminjam(nim, nama, prodi):
@@ -64,12 +61,11 @@ def register_peminjam(nim, nama, prodi):
     )
 
     conn.commit()
-    input("Input untuk kembali... ")
 
 
 def pinjam_barang(tanggal_pinjam, tanggal_kembali):
-    input("Input untuk kembali... ")
+    pass
 
 
 def kembalikan_barang():
-    input("Input untuk kembali... ")
+    pass
