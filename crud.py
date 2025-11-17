@@ -6,41 +6,52 @@ cursor = conn.cursor()
 
 def daftar_inventaris():
     cursor.execute(
-        "select nama_barang, tipe_barang, count(*) as jumlah_barang, kondisi "
-        "from inventaris i join barang b using (id_barang) "
-        "group by id_barang, kondisi, nama_barang, tipe_barang "
-        "order by id_barang;"
+        """
+        SELECT nama_barang, tipe_barang, COUNT(*) AS jumlah_barang, kondisi
+        FROM inventaris i
+        JOIN barang b USING(id_barang)
+        GROUP BY id_barang, kondisi, nama_barang, tipe_barang
+        ORDER BY id_barang
+        """
     )
     return cursor.fetchall()
 
 
 def daftar_inventaris_tersedia():
     cursor.execute(
-        "select id_barang, nama_barang, tipe_barang, count(*) as jumlah_barang "
-        "from inventaris i join barang b using (id_barang) "
-        "where kondisi='baik' "
-        "group by id_barang, kondisi, nama_barang, tipe_barang "
-        "order by id_barang;"
+        """
+        SELECT id_barang, nama_barang, tipe_barang, COUNT(*) AS jumlah_barang
+        FROM inventaris i
+        JOIN barang b USING(id_barang)
+        WHERE kondisi='baik'
+        GROUP BY id_barang, nama_barang, tipe_barang
+        ORDER BY id_barang
+        """
     )
     return cursor.fetchall()
 
 
 def daftar_barang():
-    cursor.execute("select * from barang")
+    cursor.execute("SELECT * FROM barang")
     return cursor.fetchall()
 
 
 def tambah_barang(nama, tipe):
     cursor.execute(
-        "insert into barang(nama_barang, tipe_barang) values (%s, %s)", (nama, tipe)
+        "INSERT INTO barang(nama_barang, tipe_barang) VALUES (?, ?)",
+        (nama, tipe),
     )
     conn.commit()
 
 
 def cek_inventaris(id_barang):
     cursor.execute(
-        "select * from inventaris join barang using(id_barang) "
-        "where id_barang=%s and kondisi='baik' limit 1",
+        """
+        SELECT * FROM inventaris
+        JOIN barang USING(id_barang)
+        WHERE id_barang=? AND kondisi='baik'
+        LIMIT 1
+        """,
         (id_barang,),
     )
     return cursor.fetchone()
@@ -48,7 +59,7 @@ def cek_inventaris(id_barang):
 
 def tambah_inventaris(id_barang):
     cursor.execute(
-        "insert into inventaris(id_barang, kondisi) values (%s, %s)",
+        "INSERT INTO inventaris(id_barang, kondisi) VALUES (?, ?)",
         (id_barang, "baik"),
     )
     conn.commit()
@@ -56,7 +67,7 @@ def tambah_inventaris(id_barang):
 
 def register_peminjam(nim, nama, prodi):
     cursor.execute(
-        "insert into peminjam(nim_peminjam, nama_peminjam, prodi) values (%s,%s,%s)",
+        "INSERT INTO peminjam(nim_peminjam, nama_peminjam, prodi) VALUES (?, ?, ?)",
         (nim, nama, prodi),
     )
     conn.commit()
@@ -64,20 +75,24 @@ def register_peminjam(nim, nama, prodi):
 
 def pinjam_barang(id_peminjam, id_inventaris, tanggal_pinjam, tanggal_kembali):
     cursor.execute(
-        "insert into peminjaman(id_peminjam, tanggal_pinjam, tanggal_kembali) "
-        "values (%s, %s, %s) returning id_peminjaman",
+        """
+        INSERT INTO peminjaman(id_peminjam, tanggal_pinjam, tanggal_kembali)
+        VALUES (?, ?, ?)
+        """,
         (id_peminjam, tanggal_pinjam, tanggal_kembali),
     )
-    id_peminjaman = cursor.fetchone()[0]
+    id_peminjaman = cursor.lastrowid
 
     cursor.execute(
-        "insert into detail_peminjaman(id_peminjaman, id_inventaris, jumlah_barang) "
-        "values (%s, %s, %s)",
-        (id_peminjaman, id_inventaris, 1),
+        """
+        INSERT INTO detail_peminjaman(id_peminjaman, id_inventaris, jumlah_barang)
+        VALUES (?, ?, 1)
+        """,
+        (id_peminjaman, id_inventaris),
     )
 
     cursor.execute(
-        "update inventaris set kondisi='dipinjam' where id_inventaris=%s",
+        "UPDATE inventaris SET kondisi='dipinjam' WHERE id_inventaris=?",
         (id_inventaris,),
     )
 
@@ -86,43 +101,45 @@ def pinjam_barang(id_peminjam, id_inventaris, tanggal_pinjam, tanggal_kembali):
 
 
 def daftar_peminjam():
-    cursor.execute("select * from peminjam")
+    cursor.execute("SELECT * FROM peminjam")
     return cursor.fetchall()
 
 
 def daftar_peminjaman_aktif():
     cursor.execute(
-        "select p.id_peminjaman, pm.nama_peminjam, b.nama_barang, i.id_inventaris "
-        "from peminjaman p "
-        "join peminjam pm on pm.id_peminjam = p.id_peminjam "
-        "join detail_peminjaman dp on dp.id_peminjaman = p.id_peminjaman "
-        "join inventaris i on i.id_inventaris = dp.id_inventaris "
-        "join barang b on b.id_barang = i.id_barang "
-        "where tanggal_dikembalikan is null"
+        """
+        SELECT p.id_peminjaman, pm.nama_peminjam, b.nama_barang, i.id_inventaris
+        FROM peminjaman p
+        JOIN peminjam pm ON pm.id_peminjam = p.id_peminjam
+        JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+        JOIN inventaris i ON i.id_inventaris = dp.id_inventaris
+        JOIN barang b ON b.id_barang = i.id_barang
+        WHERE p.tanggal_dikembalikan IS NULL
+        """
     )
     return cursor.fetchall()
 
 
 def kembalikan_barang(id_peminjaman, kondisi_kembali):
     cursor.execute(
-        "select id_inventaris from detail_peminjaman where id_peminjaman=%s",
+        "SELECT id_inventaris FROM detail_peminjaman WHERE id_peminjaman=?",
         (id_peminjaman,),
     )
-    id_inventaris = cursor.fetchone()[0]
+    row = cursor.fetchone()
+    id_inventaris = row["id_inventaris"]
 
     cursor.execute(
-        "update inventaris set kondisi=%s where id_inventaris=%s",
+        "UPDATE inventaris SET kondisi=? WHERE id_inventaris=?",
         (kondisi_kembali, id_inventaris),
     )
 
     cursor.execute(
-        "update peminjaman set tanggal_dikembalikan=current_date "
-        "where id_peminjaman=%s",
+        "UPDATE peminjaman SET tanggal_dikembalikan = DATE('now') WHERE id_peminjaman=?",
         (id_peminjaman,),
     )
 
     cursor.execute(
-        "update detail_peminjaman set kondisi_kembali=%s where id_peminjaman=%s",
+        "UPDATE detail_peminjaman SET kondisi_kembali=? WHERE id_peminjaman=?",
         (kondisi_kembali, id_peminjaman),
     )
 
