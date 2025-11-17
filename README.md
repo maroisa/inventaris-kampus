@@ -1,8 +1,6 @@
 # Sistem Informasi Inventaris Kampus
 
-Program Python sederhana untuk mengolah sistem informasi inventaris kampus
+Program Python sederhana untuk mengolah sistem informasi inventaris kampus. Menggunakan SQLite
 
-### Setup:
-- [PostgreSQL](https://www.postgresql.org/download/)
+**Kebutuhan**:
 - Python 3
-    - psycopg2 (install dengan `pip install psycopg2`)
