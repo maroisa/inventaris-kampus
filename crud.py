@@ -144,3 +144,26 @@ def kembalikan_barang(id_peminjaman, kondisi_kembali):
     )
 
     conn.commit()
+
+
+def riwayat_peminjaman():
+    cursor.execute(
+        """
+        SELECT
+            p.id_peminjaman,
+            pm.nama_peminjam,
+            b.nama_barang,
+            i.id_inventaris,
+            p.tanggal_pinjam,
+            p.tanggal_kembali,
+            p.tanggal_dikembalikan,
+            dp.kondisi_kembali
+        FROM peminjaman p
+        JOIN peminjam pm ON pm.id_peminjam = p.id_peminjam
+        JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+        JOIN inventaris i ON i.id_inventaris = dp.id_inventaris
+        JOIN barang b ON b.id_barang = i.id_barang
+        ORDER BY p.id_peminjaman DESC
+        """
+    )
+    return cursor.fetchall()

@@ -22,11 +22,12 @@ def menu_utama():
 2. Tambah inventaris
 3. Pinjam barang
 4. Kembalikan barang
-5. Daftarkan peminjam
-6. Tampilan peminjam
-7. Keluar
+5. Riwayat Peminjaman
+6. Daftarkan peminjam
+7. Tampilan peminjam
+8. Keluar
 """,
-            7,
+            8,
         )
 
         if pilihan == "1":
@@ -105,6 +106,22 @@ def menu_utama():
             continue
 
         if pilihan == "5":
+            data = crud.riwayat_peminjaman()
+            print("\n==== RIWAYAT PEMINJAMAN ====")
+            for r in data:
+                print("-" * 30)
+                print(f"ID Peminjaman: {r['id_peminjaman']}")
+                print(f"Peminjam: {r['nama_peminjam']}")
+                print(f"Barang: {r['nama_barang']} (Inv: {r['id_inventaris']})")
+                print(f"Tanggal Pinjam: {r['tanggal_pinjam']}")
+                print(f"Tanggal Kembali (rencana): {r['tanggal_kembali']}")
+                print(f"Tanggal Dikembalikan: {r['tanggal_dikembalikan']}")
+                print(f"Kondisi Kembali: {r['kondisi_kembali']}")
+                print("-" * 30)
+            input("Kembali...")
+            continue
+
+        if pilihan == "6":
             nim = input("NIM: ")
             nama = input("Nama: ")
             prodi = input("Prodi: ")
@@ -113,7 +130,7 @@ def menu_utama():
             print("Peminjam berhasil ditambahkan.")
             input("Kembali...")
             continue
-        if pilihan == "6":
+        if pilihan == "7":
             peminjam = crud.daftar_peminjam()
             print("\n==== PILIH PEMINJAM ====")
             for i, p in enumerate(peminjam):
