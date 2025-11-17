@@ -1,71 +1,70 @@
-drop table if exists detail_peminjaman;
-drop table if exists inventaris;
-drop table if exists peminjaman;
+DROP TABLE IF EXISTS detail_peminjaman;
+DROP TABLE IF EXISTS peminjaman;
+DROP TABLE IF EXISTS inventaris;
+DROP TABLE IF EXISTS peminjam;
+DROP TABLE IF EXISTS barang;
 
-drop table if exists barang;
-drop table if exists peminjam;
-
-create type kondisi_inventaris_enum as enum('baik', 'rusak', 'dipinjam');
-create type kondisi_enum as enum('baik', 'rusak');
-
-create table barang (
-    id_barang serial primary key,
-    nama_barang varchar(100) not null unique,
-    tipe_barang varchar(100) not null
+CREATE TABLE barang (
+    id_barang INTEGER PRIMARY KEY AUTOINCREMENT,
+    nama_barang TEXT NOT NULL UNIQUE,
+    tipe_barang TEXT NOT NULL
 );
 
-create table peminjam (
-    id_peminjam serial primary key,
-    nim_peminjam varchar(20) not null unique,
-    nama_peminjam varchar(100) not null,
-    prodi varchar(100) not null
+CREATE TABLE peminjam (
+    id_peminjam INTEGER PRIMARY KEY AUTOINCREMENT,
+    nim_peminjam TEXT NOT NULL UNIQUE,
+    nama_peminjam TEXT NOT NULL,
+    prodi TEXT NOT NULL
 );
 
-create table inventaris (
-    id_inventaris serial primary key,
-    id_barang int references barang,
-    kondisi kondisi_inventaris_enum not null
+CREATE TABLE inventaris (
+    id_inventaris INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_barang INTEGER,
+    kondisi TEXT CHECK(kondisi IN ('baik', 'rusak', 'dipinjam')) NOT NULL,
+    FOREIGN KEY(id_barang) REFERENCES barang(id_barang)
 );
 
-create table peminjaman (
-    id_peminjaman serial primary key,
-    id_peminjam int references peminjam,
-    tanggal_pinjam date default current_date,
-    tanggal_kembali date not null,
-    tanggal_dikembalikan date
+CREATE TABLE peminjaman (
+    id_peminjaman INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_peminjam INTEGER,
+    tanggal_pinjam TEXT DEFAULT CURRENT_DATE,
+    tanggal_kembali TEXT NOT NULL,
+    tanggal_dikembalikan TEXT,
+    FOREIGN KEY(id_peminjam) REFERENCES peminjam(id_peminjam)
 );
 
-create table detail_peminjaman (
-    id_detail_peminjaman serial primary key,
-    id_peminjaman int references peminjaman,
-    id_inventaris int references inventaris,
-    jumlah_barang int not null,
-    kondisi_kembali kondisi_enum
+CREATE TABLE detail_peminjaman (
+    id_detail_peminjaman INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_peminjaman INTEGER,
+    id_inventaris INTEGER,
+    jumlah_barang INTEGER NOT NULL,
+    kondisi_kembali TEXT CHECK(kondisi_kembali IN ('baik', 'rusak')),
+    FOREIGN KEY(id_peminjaman) REFERENCES peminjaman(id_peminjaman),
+    FOREIGN KEY(id_inventaris) REFERENCES inventaris(id_inventaris)
 );
 
-insert into barang(nama_barang, tipe_barang) values
+INSERT INTO barang(nama_barang, tipe_barang) VALUES
 ('Lenovo LOQ', 'Laptop'),
 ('Lenovo Thinkpad X1', 'Laptop'),
 ('Mikrotik hEX S', 'Router'),
 ('Cisco Catalyst 8300', 'Router'),
 ('VGA to HDMI', 'Adapter');
 
-insert into peminjam(nim_peminjam, nama_peminjam, prodi) values
+INSERT INTO peminjam(nim_peminjam, nama_peminjam, prodi) VALUES
 ('K123121', 'John Doe', 'PTIK'),
 ('K123125', 'Foo', 'PTM'),
 ('K124012', 'Bar', 'PTB'),
 ('K124132', 'John Kenshi', 'Informatika');
 
-
-insert into inventaris(id_barang, kondisi) values
-(1, 'baik'),
-(2, 'baik'),
-(3, 'baik'),
-(3, 'baik'),
-(3, 'baik'),
-(3, 'dipinjam'),
-(3, 'dipinjam'),
-(3, 'rusak'),
-(4, 'baik'),
-(4, 'baik'),
-(5, 'baik');
+INSERT INTO inventaris(id_barang, kondisi) VALUES
+(1,'baik'),
+(2,'baik'),
+(3,'baik'),
+(3,'baik'),
+(3,'baik'),
+(3,'dipinjam'),
+(3,'dipinjam'),
+(3,'rusak'),
+(4,'baik'),
+(4,'baik'),
+(5,'baik');
