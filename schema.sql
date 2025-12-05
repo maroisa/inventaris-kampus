@@ -1,20 +1,12 @@
 DROP TABLE IF EXISTS detail_peminjaman;
 DROP TABLE IF EXISTS peminjaman;
 DROP TABLE IF EXISTS inventaris;
-DROP TABLE IF EXISTS peminjam;
 DROP TABLE IF EXISTS barang;
 
 CREATE TABLE barang (
     id_barang INTEGER PRIMARY KEY AUTOINCREMENT,
     nama_barang TEXT NOT NULL UNIQUE,
     tipe_barang TEXT NOT NULL
-);
-
-CREATE TABLE peminjam (
-    id_peminjam INTEGER PRIMARY KEY AUTOINCREMENT,
-    nim_peminjam TEXT NOT NULL UNIQUE,
-    nama_peminjam TEXT NOT NULL,
-    prodi TEXT NOT NULL
 );
 
 CREATE TABLE inventaris (
@@ -26,11 +18,10 @@ CREATE TABLE inventaris (
 
 CREATE TABLE peminjaman (
     id_peminjaman INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_peminjam INTEGER,
+    nama_peminjam TEXT NOT NULL,
     tanggal_pinjam TEXT DEFAULT CURRENT_DATE,
     tanggal_kembali TEXT NOT NULL,
-    tanggal_dikembalikan TEXT,
-    FOREIGN KEY(id_peminjam) REFERENCES peminjam(id_peminjam)
+    tanggal_dikembalikan TEXT
 );
 
 CREATE TABLE detail_peminjaman (
@@ -49,12 +40,6 @@ INSERT INTO barang(nama_barang, tipe_barang) VALUES
 ('Mikrotik hEX S', 'Router'),
 ('Cisco Catalyst 8300', 'Router'),
 ('VGA to HDMI', 'Adapter');
-
-INSERT INTO peminjam(nim_peminjam, nama_peminjam, prodi) VALUES
-('K123121', 'John Doe', 'PTIK'),
-('K123125', 'Foo', 'PTM'),
-('K124012', 'Bar', 'PTB'),
-('K124132', 'John Kenshi', 'Informatika');
 
 INSERT INTO inventaris(id_barang, kondisi) VALUES
 (1,'baik'),

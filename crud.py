@@ -3,7 +3,6 @@ from db import init_db
 conn = init_db()
 cursor = conn.cursor()
 
-
 def daftar_inventaris():
     cursor.execute(
         """
@@ -65,21 +64,13 @@ def tambah_inventaris(id_barang):
     conn.commit()
 
 
-def register_peminjam(nim, nama, prodi):
-    cursor.execute(
-        "INSERT INTO peminjam(nim_peminjam, nama_peminjam, prodi) VALUES (?, ?, ?)",
-        (nim, nama, prodi),
-    )
-    conn.commit()
-
-
-def pinjam_barang(id_peminjam, id_inventaris, tanggal_pinjam, tanggal_kembali):
+def pinjam_barang(nama_peminjam, id_inventaris, tanggal_pinjam, tanggal_kembali):
     cursor.execute(
         """
-        INSERT INTO peminjaman(id_peminjam, tanggal_pinjam, tanggal_kembali)
+        INSERT INTO peminjaman(nama_peminjam, tanggal_pinjam, tanggal_kembali)
         VALUES (?, ?, ?)
         """,
-        (id_peminjam, tanggal_pinjam, tanggal_kembali),
+        (nama_peminjam, tanggal_pinjam, tanggal_kembali),
     )
     id_peminjaman = cursor.lastrowid
 
@@ -99,18 +90,11 @@ def pinjam_barang(id_peminjam, id_inventaris, tanggal_pinjam, tanggal_kembali):
     conn.commit()
     return id_peminjaman
 
-
-def daftar_peminjam():
-    cursor.execute("SELECT * FROM peminjam")
-    return cursor.fetchall()
-
-
 def daftar_peminjaman_aktif():
     cursor.execute(
         """
-        SELECT p.id_peminjaman, pm.nama_peminjam, b.nama_barang, i.id_inventaris
+        SELECT p.id_peminjaman, nama_peminjam, b.nama_barang, i.id_inventaris
         FROM peminjaman p
-        JOIN peminjam pm ON pm.id_peminjam = p.id_peminjam
         JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
         JOIN inventaris i ON i.id_inventaris = dp.id_inventaris
         JOIN barang b ON b.id_barang = i.id_barang
@@ -151,7 +135,7 @@ def riwayat_peminjaman():
         """
         SELECT
             p.id_peminjaman,
-            pm.nama_peminjam,
+            nama_peminjam,
             b.nama_barang,
             i.id_inventaris,
             p.tanggal_pinjam,
@@ -159,7 +143,6 @@ def riwayat_peminjaman():
             p.tanggal_dikembalikan,
             dp.kondisi_kembali
         FROM peminjaman p
-        JOIN peminjam pm ON pm.id_peminjam = p.id_peminjam
         JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
         JOIN inventaris i ON i.id_inventaris = dp.id_inventaris
         JOIN barang b ON b.id_barang = i.id_barang
