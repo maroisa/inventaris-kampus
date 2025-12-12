@@ -21,10 +21,12 @@ def menu_utama():
             """==== MENU UTAMA ====
 1. Tampilkan inventaris
 2. Tambah inventaris
-3. Pinjam barang
-4. Kembalikan barang
-5. Riwayat Peminjaman
-6. Keluar
+3. Perbaiki barang inventaris
+4. Laporkan kerusakan inventaris
+5. Pinjam barang
+6. Kembalikan barang
+7. Riwayat Peminjaman
+8. Keluar
 """,
             8
         )
@@ -60,6 +62,38 @@ def menu_utama():
             continue
 
         if pilihan == "3":
+            barang_rusak = crud.daftar_inventaris_rusak()
+            if not barang_rusak:
+                print("Tidak ada barang rusak")
+                input("Kembali...")
+                continue
+            print("\n==== DAFTAR BARANG RUSAK ====")
+            for i in barang_rusak:
+                print(f"ID {i[0]} | {i[1]} | Kondisi: rusak")
+
+            pilih = input("Masukkan ID inventaris yang ingin diperbaiki: ")
+            crud.ubah_kondisi_inventaris(pilih, "baik")
+            print("Status barang telah diubah menjadi baik")
+            input("Kembali...")
+            continue
+
+        if pilihan == "4":
+            barang_baik = crud.daftar_inventaris_baik()
+            if not barang_baik:
+                print("Barang rusak semua")
+                input("Kembali...")
+                continue
+            print("\n==== DAFTAR BARANG ====")
+            for i in barang_baik:
+                print(f"ID {i[0]} | {i[1]} | Kondisi: baik")
+
+            pilih = input("masukkan ID inventaris yang dilaporkan rusak: ")
+            crud.ubah_kondisi_inventaris(pilih, "rusak")
+            print("Status barang telah diubah menjadi rusak")
+            input("Kembali...")
+            continue
+
+        if pilihan == "5":
             res = crud.daftar_inventaris_tersedia()
             print("\n===== BARANG TERSEDIA =====")
             for row in res:
@@ -83,7 +117,7 @@ def menu_utama():
             input("Kembali...")
             continue
 
-        if pilihan == "4":
+        if pilihan == "6":
             aktif = crud.daftar_peminjaman_aktif()
             if not aktif:
                 print("Tidak ada peminjaman aktif.")
@@ -102,7 +136,7 @@ def menu_utama():
             input("Kembali...")
             continue
 
-        if pilihan == "5":
+        if pilihan == "7":
             data = crud.riwayat_peminjaman()
             print("\n==== RIWAYAT PEMINJAMAN ====")
             for r in data:

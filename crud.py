@@ -15,6 +15,34 @@ def daftar_inventaris():
     )
     return cursor.fetchall()
 
+def daftar_inventaris_rusak():
+    cursor.execute(
+        """
+        SELECT id_inventaris, nama_barang, tipe_barang
+        FROM inventaris i
+        JOIN barang b USING(id_barang)
+        WHERE kondisi='rusak'
+        ORDER BY id_inventaris
+        """
+    )
+    return cursor.fetchall()
+
+def daftar_inventaris_baik():
+    cursor.execute(
+        """
+        SELECT id_inventaris, nama_barang, tipe_barang
+        FROM inventaris i
+        JOIN barang b USING(id_barang)
+        WHERE kondisi='baik'
+        ORDER BY id_inventaris
+        """
+    )
+    return cursor.fetchall()
+
+
+def ubah_kondisi_inventaris(id_inventaris, kondisi):
+    cursor.execute("UPDATE inventaris SET kondisi=? WHERE id_inventaris=?", (kondisi, id_inventaris))
+    conn.commit()
 
 def daftar_inventaris_tersedia():
     cursor.execute(
