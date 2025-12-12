@@ -11,6 +11,7 @@ def get_pilihan(message: str, num: int):
         print("\nInput tidak valid")
         pilihan = input("Masukkan pilihan: ")
 
+        
     return pilihan
 
 
@@ -25,14 +26,18 @@ def menu_utama():
 5. Riwayat Peminjaman
 6. Keluar
 """,
-            8,
+            8
         )
 
         if pilihan == "1":
             res = crud.daftar_inventaris()
+            tipe = []
             print("\n===== DAFTAR INVENTARIS =====")
             for row in res:
-                print(f"{row[0]} ({row[1]}) | Jumlah: {row[2]} | Kondisi: {row[3]}")
+                if not row[1] in tipe:
+                    tipe.append(row[1])
+                    print("\n-- " + row[1] + " --")
+                print(f"{row[0]} | Jumlah: {row[2]} | Kondisi: {row[3]}")
             input("Kembali...")
             continue
 
